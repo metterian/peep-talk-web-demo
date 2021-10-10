@@ -7,11 +7,10 @@ from upload import logo
 import random
 import requests
 
-import urllib.parse
+from urllib.parse import urljoin
 
-url_join = urllib.parse.urljoin
-message = lambda text: "chatbot response"
 URL = 'http://nlplab.iptime.org:47079/'
+
 
 def right_align(text, bold = False):
     return f"<p style='text-align: right;'>{text}</p>"
@@ -19,20 +18,19 @@ def right_align(text, bold = False):
 def bold(text):
     return f"<p style='text-align: right;'><b>{text}</b></p>"
 
-
-def display_session_state():
+def display_dialogue():
+    '''display between Human and Chatbot conversation'''
     if not st.session_state.chatbot:
         return
     for human, chatbot in zip(st.session_state.human, st.session_state.chatbot):
         st.markdown(right_align(f'You: {human}'), unsafe_allow_html=True)
         st.write(f'Bot: {chatbot}')
 
-
-
 # Initialization
 if 'chatbot' not in st.session_state:
     st.session_state['human'] = []
     st.session_state['chatbot'] = []
+
 
 
 title_container = st.container()
@@ -43,14 +41,18 @@ with title_container:
     with col2:
         st.title('PEEP-Talk')
 
-personality = requests.get(url_join(URL, 'persona_info')).json()
+
+# title
+personality = requests.get(urljoin(URL, 'info')).json()
 personality = map(lambda string: string.capitalize(), personality)
 
+# sub title - Personality
 st.subheader("Personality")
 st.text("\n".join(personality))
 
-st.subheader("Context Detector")
 
+# sub title - Context Detector
+st.subheader("Context Detector")
 col1, col2 = st.columns(2)
 
 def diplay_cd(sim_score: int, lang_score: int):
@@ -64,7 +66,7 @@ def diplay_cd(sim_score: int, lang_score: int):
             label='Linguistic Acceptability', min_value=0,
             max_value=100, value=lang_score, key='error')
 
-
+# divide section
 st.markdown('---')
 
 dialogue_container = st.container()
@@ -76,15 +78,14 @@ with st.form(key='user_form', clear_on_submit=True):
 
     if submit_button:
         st.session_state['human'].append(user_input)
-
-        response = requests.post(url_join(URL, 'receive'), json = {'user_input': user_input}).json()
+        response = requests.post(urljoin(URL, 'message'), json = {'user_input': user_input}).json()
         st.session_state['chatbot'].append(response['message'])
 
-
+# messsage box
 if submit_button:
     with dialogue_container.form(key='bot_form'):
         # st.write('Bot')
-        display_session_state()
+        display_dialogue()
         print(response)
         reset_button = st.form_submit_button(label='', on_click=diplay_cd(int(response['similarity']), int(response['acceptability'])))
 
