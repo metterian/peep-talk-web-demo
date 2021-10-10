@@ -3,7 +3,7 @@ from typing import List
 
 from streamlit.state.session_state import SessionState
 from upload import logo
-
+from truecase import get_true_case
 import random
 import requests
 
@@ -24,12 +24,13 @@ def display_dialogue():
         return
     for human, chatbot in zip(st.session_state.human, st.session_state.chatbot):
         st.markdown(right_align(f'You: {human}'), unsafe_allow_html=True)
-        st.write(f'Bot: {chatbot}')
+        st.write(f'Bot: {get_true_case(chatbot)}')
 
 # Initialization
 if 'chatbot' not in st.session_state:
     st.session_state['human'] = []
     st.session_state['chatbot'] = []
+    requests.get(urljoin('history/clear', URL))
 
 
 # title
@@ -43,7 +44,7 @@ with title_container:
 
 
 # sub title - Personality
-personality = requests.get(urljoin(URL, 'personalities')).json()
+personality = requests.get(urljoin(URL, 'personality')).json()
 personality = map(lambda string: string.capitalize(), personality)
 st.subheader("Personality")
 st.text("\n".join(personality))
