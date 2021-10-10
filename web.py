@@ -32,7 +32,7 @@ if 'chatbot' not in st.session_state:
     st.session_state['chatbot'] = []
 
 
-
+# title
 title_container = st.container()
 col1, col2 = st.columns([1, 20])
 with title_container:
@@ -42,11 +42,9 @@ with title_container:
         st.title('PEEP-Talk')
 
 
-# title
+# sub title - Personality
 personality = requests.get(urljoin(URL, 'info')).json()
 personality = map(lambda string: string.capitalize(), personality)
-
-# sub title - Personality
 st.subheader("Personality")
 st.text("\n".join(personality))
 
