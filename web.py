@@ -43,7 +43,7 @@ with title_container:
 
 
 # sub title - Personality
-personality = requests.get(urljoin(URL, 'info')).json()
+personality = requests.get(urljoin(URL, 'personalities')).json()
 personality = map(lambda string: string.capitalize(), personality)
 st.subheader("Personality")
 st.text("\n".join(personality))
